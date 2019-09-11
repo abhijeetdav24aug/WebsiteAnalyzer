@@ -5,5 +5,5 @@ import java.util.ArrayList;
 interface Collectors {
     ArrayList<String> getSearchResultLinks(String keyword, int amount);
 
-    String getContentOfPage();
+    String getContentOfPage(String url);
 }

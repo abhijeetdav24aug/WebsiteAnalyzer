@@ -10,14 +10,20 @@ import java.util.ArrayList;
 
 public class Collector implements Collectors {
     private String baseUrl;
+    private SearchEngine searchEngine;
+
+    public Collector(SearchEngine searchEngine) {
+        this.baseUrl = null;
+        this.searchEngine = searchEngine;
+    }
 
     public Collector() {
-        baseUrl = null;
+        this(SearchEngine.GOOGLE);
     }
 
     public ArrayList<String> getSearchResultLinks(String keyword, int amount) {
         ArrayList<String> result = new ArrayList<>(amount);
-        baseUrl = "http://www.google.de/search?q=" + keyword;
+        baseUrl = searchEngine.getQueryUrl() + keyword;
         while (result.size() < amount) {
             for (Element link : getLinkElements()) {
                 if (result.size() < amount) {
@@ -30,19 +36,22 @@ public class Collector implements Collectors {
         return result;
     }
 
-    public String getContentOfPage() {
-        return null;
+    public String getContentOfPage(String url) {
+        return getDocument(url).text();
     }
 
     private Elements getLinkElements() {
-        Elements result = null;
+        Document document = getDocument(baseUrl);
+        baseUrl = document.selectFirst(searchEngine.getCssQueryNext()).attr("abs:href");
+        return document.select(searchEngine.getCssQueryResult());
+    }
+
+    private Document getDocument(String url) {
         try {
-            Document document = Jsoup.connect(baseUrl).get();
-            result = document.select(".r > a");
-            baseUrl = document.selectFirst("a#pnnext").attr("abs:href");
+            return Jsoup.connect(url).get();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return result;
+        return null;
     }
 }

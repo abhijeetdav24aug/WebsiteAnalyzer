@@ -7,8 +7,9 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
-public class Collector implements Collectors {
+public class Collector {
     private String baseUrl;
     private SearchEngine searchEngine;
 
@@ -19,6 +20,14 @@ public class Collector implements Collectors {
 
     public Collector() {
         this(SearchEngine.GOOGLE);
+    }
+
+    public static void main(String[] args) {
+        Collector c = new Collector();
+        String result = c.getSearchResultLinks("Kompressor", 10).get(1);
+        Preparator p = new Preparator();
+        LinkedList<String> l = p.formatContent(c.getContentOfPage(result));
+        System.out.println(p.removeBlacklistedContent(l));
     }
 
     public ArrayList<String> getSearchResultLinks(String keyword, int amount) {
